@@ -1,5 +1,5 @@
-from pydantic import BaseModel
-from typing import List
+from pydantic import BaseModel, EmailStr
+from typing import List, Dict
 
 
 #Advocates Base schema
@@ -7,18 +7,20 @@ class AdvocatesBase(BaseModel):
 
     id: int
     name: str
+    password: str
+    email: EmailStr
     profile_pic: str
     short_bio: str
     long_bio: str
     advocate_years_exp: int
-    links: dict
+    links: Dict | None
 
 #Advocates request schema for registring advocates
 class AdvocatesRequest(BaseModel):
     short_bio: str
     long_bio: str
     advocate_years_exp: int
-    links: dict
+    links: Dict | None
 
 #Base information for company
 class CompanyBase(BaseModel):
@@ -37,4 +39,4 @@ class CompanyResponse2(CompanyBase):
 
 #Advocates response schema for advocates routes
 class AdvocatesResponse(AdvocatesBase):
-       company: CompanyResponse2
+       company: CompanyResponse2 | None
