@@ -1,50 +1,49 @@
-from fastapi import FastAPI, UploadFile, File
-import schemas
+from fastapi import FastAPI, UploadFile, File, Query
+from pydantic import EmailStr
+import schemas, auth
 
 app = FastAPI()
 
+app.include_router(auth.router)
 
 @app.get('/')
 def index():
     return {'hello': 'world'}
 
 
-@app.post('/upload_photo')
+@app.post('/upload_photo', tags=['admin'])
 async def upload_photo(file: bytes = File()):
     # print(file.content_type)
     return file
 
 #Advocates routes
 
-@app.post('/advocates', response_model=schemas.AdvocatesResponse)
+@app.post('/advocates', response_model=schemas.AdvocatesResponse, tags=['Advocates'])
 def set_advocates(
-    id: int,
-                name: str, 
-                profile_pic: str,
+                email: str,
+                password: str,
                 request: schemas.AdvocatesRequest):
 
-    data={'id': id, 'name': name, 'profile_pic': profile_pic, 'short_bio': request.short_bio, 'long_bio': request.long_bio, 'advocate_years_exp': request.advocate_years_exp, 'links': request.links}
-    print(data)
     return data
 
-@app.get('/advocates')
+@app.get('/advocates', tags=['Advocates'])
 def get_advocates():
-    pass
+    return data
 
-@app.get('/advocates/{id}')
+@app.get('/advocates/{id}', tags=['Advocates'])
 def get_advocates_id():
     pass
 
 #Companies routes
 
-@app.post('/companies')
+@app.post('/companies', tags=['Company'])
 def set_companies():
     pass
 
-@app.get('/companies/')
+@app.get('/companies/', tags=['Company'])
 def get_companies():
     pass
 
-@app.get('/companies/{id}')
+@app.get('/companies/{id}', tags=['Company'])
 def get_companies_id():
     pass

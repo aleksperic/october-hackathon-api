@@ -17,6 +17,8 @@ class AdvocatesBase(BaseModel):
 
 #Advocates request schema for registring advocates
 class AdvocatesRequest(BaseModel):
+    password: str
+    email: EmailStr
     short_bio: str
     long_bio: str
     advocate_years_exp: int
@@ -40,3 +42,7 @@ class CompanyResponse2(CompanyBase):
 #Advocates response schema for advocates routes
 class AdvocatesResponse(AdvocatesBase):
        company: CompanyResponse2 | None
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
