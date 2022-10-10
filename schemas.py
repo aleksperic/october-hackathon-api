@@ -44,13 +44,13 @@ class CompanyResponse1(CompanyBase):
 class CompanyResponse2(CompanyBase):
     href: str
 
-class CompanyRequest(CompanyBase):
+class CompanyRequest(BaseModel):
+    logo: str
     summary: str
-    href: str
 
 #Advocates response schema for advocates routes
 class AdvocatesResponse(AdvocatesBase):
-       company: CompanyBase | None
+       company: CompanyResponse2 | None
 
 class Token(BaseModel):
     access_token: str

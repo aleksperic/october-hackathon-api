@@ -30,7 +30,8 @@ def get_advocates(
 @router.get('/advocates/{id}', response_model=schemas.AdvocatesResponse, tags=['Advocates'])
 def get_advocates_id(
                     id: int, 
-                    db: Session = Depends(get_db)
+                    db: Session = Depends(get_db),
+                    current_user: schemas.AdvocatesResponse = Depends(get_current_user)
                     ):
     return utils.get_advocates_id(id, db)
 

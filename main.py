@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from database import Base, engine
 import schemas, auth, models, advocates, company
 
