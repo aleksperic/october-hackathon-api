@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, File, UploadFile
 from sqlalchemy.orm import Session
 from database import get_db
 from auth import get_current_user
@@ -6,29 +6,40 @@ from typing import List
 import schemas, utils
 
 
-router = APIRouter()
+router = APIRouter(
+            prefix='/companies',
+            tags=['Company']
+            )
 
-@router.post('/companies', response_model=schemas.CompanyResponse2, tags=['Company'])
+@router.post('', response_model=schemas.CompanyResponse2)
 def new_company(
                 name: str,
                 href: Request,
                 request: schemas.CompanyRequest, 
                 db: Session = Depends(get_db),
-                current_user: schemas.AdvocatesResponse = Depends(get_current_user)
+                #current_user: schemas.AdvocatesResponse = Depends(get_current_user)
                 ):
     return utils.new_company(name, href, request, db)
     
-@router.get('/companies', response_model=List[schemas.CompanyResponse1], tags=['Company'])
+@router.get('', response_model=List[schemas.CompanyResponse1])
 def get_companies(
                 db: Session = Depends(get_db),
                 current_user: schemas.AdvocatesResponse = Depends(get_current_user)
                 ):
     return utils.get_companies(db)
 
-@router.get('/companies/{id}', response_model=schemas.CompanyResponse1, tags=['Company'])
+@router.get('/{id}', response_model=schemas.CompanyResponse1)
 def get_companies_id(
                 id: int,
                 db: Session = Depends(get_db),
                 current_user: schemas.AdvocatesResponse = Depends(get_current_user)
                 ):
     return utils.get_companies_id(id, db)
+
+# @router.post('/upload')
+# async def upload_photo(
+#                 company: str = Depends(schemas.CompanyBase),
+#                 file: UploadFile = File(...)
+#                 ):
+  
+#     return utils.upload(file, company)

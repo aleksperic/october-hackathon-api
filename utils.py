@@ -9,13 +9,16 @@ BASE_DIR = pathlib.Path(__file__).parent
 UPLOAD_DIR = BASE_DIR / 'uploads'
 
 
-async def upload(file, current_user):
+async def upload(file, current_user, db):
     bytes_str = io.BytesIO(await file.read())
     fname = pathlib.Path(file.filename)
     fext = fname.suffix
     destination = UPLOAD_DIR / f'{current_user.name.replace(" ", "-")}{fext}'
     with open(str(destination), 'wb') as out:
         out.write(bytes_str.read())
+    user = db.query(models.Advocates).filter(models.Advocates.name == current_user.name)
+    user.update({'profile_pic': str(destination)})
+    db.commit()
     return destination
 
 def sign_up(email, password, company_name, request, db):
@@ -27,14 +30,14 @@ def sign_up(email, password, company_name, request, db):
     if not company_id.first():
         raise HTTPException(status_code=404, detail=f'Company with name -{company_name}- not found!')
     new_user = models.Advocates(
-                                email=email, 
-                                password=password_hash, 
-                                company_id=company_id,
-                                name=request.name, 
-                                short_bio=request.short_bio, 
-                                long_bio=request.long_bio, 
-                                advocate_years_exp=request.advocate_years_exp
-                                )
+                            email=email, 
+                            password=password_hash, 
+                            company_id=company_id,
+                            name=request.name,
+                            short_bio=request.short_bio, 
+                            long_bio=request.long_bio, 
+                            advocate_years_exp=request.advocate_years_exp
+                            )
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
@@ -55,10 +58,10 @@ def new_company(name, href, request, db):
         raise HTTPException(status_code=406, detail=f'Company with name -{name}- alredy exists!')
     href = href.url.path
     new_company = models.Company(
-                                name=name, 
-                                logo=request.logo,
-                                summary=request.summary, 
-                                href=href)
+                            name=name,
+                            summary=request.summary, 
+                            href=href
+                            )
     db.add(new_company)
     db.commit()
     new_company.href += f'/{new_company.id}'

@@ -45,7 +45,6 @@ class CompanyResponse2(CompanyBase):
     href: str
 
 class CompanyRequest(BaseModel):
-    logo: str
     summary: str
 
 #Advocates response schema for advocates routes
