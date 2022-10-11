@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, File, UploadFile
 from sqlalchemy.orm import Session
 from database import get_db
 from auth import get_current_user
@@ -38,3 +38,11 @@ def get_advocates_id(
 @router.get('/me', response_model=schemas.AdvocatesResponse, tags=['Advocates'])
 def my_profile(current_user: schemas.AdvocatesResponse = Depends(get_current_user)):
     return current_user
+
+@router.post('/advocates/upload')
+async def upload_photo(
+                file: UploadFile = File(...),
+                current_user: schemas.AdvocatesResponse = Depends(get_current_user)
+                ):
+  
+    return utils.upload(file, current_user)

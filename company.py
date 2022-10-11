@@ -13,7 +13,8 @@ def new_company(
                 name: str,
                 href: Request,
                 request: schemas.CompanyRequest, 
-                db: Session = Depends(get_db)
+                db: Session = Depends(get_db),
+                current_user: schemas.AdvocatesResponse = Depends(get_current_user)
                 ):
     return utils.new_company(name, href, request, db)
     

@@ -33,6 +33,7 @@ MANIFEST
 *.spec
 .vscode
 *.db
+.DS_Store
 
 # Installer logs
 pip-log.txt

@@ -1,6 +1,22 @@
+import io
+import pathlib
 import models
 from auth import hash_password
 from fastapi import status, HTTPException
+
+
+BASE_DIR = pathlib.Path(__file__).parent
+UPLOAD_DIR = BASE_DIR / 'uploads'
+
+
+async def upload(file, current_user):
+    bytes_str = io.BytesIO(await file.read())
+    fname = pathlib.Path(file.filename)
+    fext = fname.suffix
+    destination = UPLOAD_DIR / f'{current_user.name.replace(" ", "-")}{fext}'
+    with open(str(destination), 'wb') as out:
+        out.write(bytes_str.read())
+    return destination
 
 def sign_up(email, password, company_name, request, db):
     email_check = db.query(models.Advocates).filter(models.Advocates.email == email).first()
