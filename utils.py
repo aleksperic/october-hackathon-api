@@ -2,22 +2,41 @@ import io
 import pathlib
 import models
 from auth import hash_password
-from fastapi import status, HTTPException
+from fastapi import HTTPException
 
 
 BASE_DIR = pathlib.Path(__file__).parent
 UPLOAD_DIR = BASE_DIR / 'uploads'
 
 
-async def upload(file, current_user, db):
-    bytes_str = io.BytesIO(await file.read())
-    fname = pathlib.Path(file.filename)
-    fext = fname.suffix
-    destination = UPLOAD_DIR / f'{current_user.name.replace(" ", "-")}{fext}'
-    with open(str(destination), 'wb') as out:
-        out.write(bytes_str.read())
-    user = db.query(models.Advocates).filter(models.Advocates.name == current_user.name)
-    user.update({'profile_pic': str(destination)})
+async def upload(file, user, db, route):
+
+    uploaded_file = await file.read()
+
+    file_name = pathlib.Path(file.filename)
+    file_ext = file_name.suffix
+
+    if len(uploaded_file) > 2_000_000:
+        raise HTTPException(status_code=413, detail='Uploaded file should be less than 2MB')
+    if file_ext not in ['.jpg', '.jpeg', '.png']:
+        raise HTTPException(status_code=422, detail='Only JPG/JPEG/PNG format supported!')
+    
+    bytes_str = io.BytesIO(uploaded_file)
+    
+    if route == '/advocates':
+        destination = UPLOAD_DIR / f'advocates/{user.name.replace(" ", "-")}{file_ext}'
+        with open(str(destination), 'wb') as out:
+            out.write(bytes_str.read())
+        user = db.query(models.Advocates).filter(models.Advocates.name == user.name)
+        user.update({'profile_pic': str(destination)})
+    
+    if route == '/companies':
+        destination = UPLOAD_DIR / f'companies/{user.name.replace(" ", "-")}{file_ext}'
+        with open(str(destination), 'wb') as out:
+            out.write(bytes_str.read())
+        company = db.query(models.Company).filter(models.Company.name == user.name)
+        company.update({'logo': str(destination)})
+
     db.commit()
     return destination
 
@@ -51,6 +70,17 @@ def get_advocates_id(id, db):
     if not user:
         raise HTTPException(status_code=404, detail=f'User with id -{id}- not found!')
     return user
+
+# def update_profile(request, current_user, db):
+#     user = db.query(models.Advocates).filter(models.Advocates.email == current_user.email).first()
+#     request_data = dict(request)
+#     print(user.__dict__['name'])
+#     for key, data in request_data.items():
+#         if user.__dict__[key] != data:
+#             print(user)
+#             # user.update({key: data}, synchronize_session=False)
+#     db.commit()
+#     return user
 
 def new_company(name, href, request, db):
     company_check = db.query(models.Company).filter(models.Company.name == name).first()

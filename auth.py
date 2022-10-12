@@ -31,7 +31,7 @@ CREDENTIALS_EXCEPTION = HTTPException(
 
 # Custom login form
 class OAuth2CustomForm:
-    def __init__(self,  email: str = Form(), password: str = Form()):
+    def __init__(self,  email: EmailStr = Form(), password: str = Form()):
         self.email = email
         self.password = password
 
@@ -42,13 +42,13 @@ def hash_password(password: str):
 def verify_password(plain_password: str, hashed_password: str):
     return pwd_context.verify(plain_password, hashed_password)
 
-def get_user_from_db(email: str, db: Session):
+def get_user_from_db(email: EmailStr, db: Session):
     user = db.query(models.Advocates).filter(models.Advocates.email == email).first()
     if not user:
         return False
     return user
 
-def authenticate_user(email: str, password: str, db: Session):
+def authenticate_user(email: EmailStr, password: str, db: Session):
     user = db.query(models.Advocates).filter(models.Advocates.email == email).first()
     if user is None:
         raise CREDENTIALS_EXCEPTION
