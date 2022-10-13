@@ -13,7 +13,7 @@ class AdvocatesBase(BaseModel):
     short_bio: str
     long_bio: str
     advocate_years_exp: int
-    links: Dict[str, str] | None = None
+    links: Dict[str, str] | None
     class Config:
         orm_mode = True
 
@@ -24,11 +24,11 @@ class AdvocatesRequest(BaseModel):
     short_bio: str
     long_bio: str
     advocate_years_exp: int
-    links: Dict[str, str] | None = None
+    links: Dict[str, str] | None
 
 # Advocates request schema for updating Advocates
 class AdvocatesUpdateRequest(AdvocatesRequest):
-    password: str | None
+    pass
 
 # Company base schema
 class CompanyBase(BaseModel):
