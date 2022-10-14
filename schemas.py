@@ -13,7 +13,7 @@ class AdvocatesBase(BaseModel):
     short_bio: str
     long_bio: str
     advocate_years_exp: int
-    links: Dict[str, str] | None
+    links: str | None
     class Config:
         orm_mode = True
 

@@ -47,7 +47,7 @@ def get_advocates_id(
 def my_profile(current_user: schemas.AdvocatesResponse = Depends(get_current_user)):
     return current_user
 
-@router.put('/me/update', response_model=schemas.AdvocatesResponse)
+@router.put('/me/update')
 def update_profile(
             request: schemas.AdvocatesUpdateRequest,
             current_user: schemas.AdvocatesResponse = Depends(get_current_user), 

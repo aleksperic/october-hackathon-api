@@ -1,6 +1,7 @@
 import io
 import pathlib
 import models
+import json
 from auth import hash_password
 from fastapi import HTTPException
 
@@ -48,15 +49,17 @@ def sign_up(email, password, company_name, request, db):
     company_id=db.query(models.Company.id).filter(models.Company.name == company_name)
     if not company_id.first():
         raise HTTPException(status_code=404, detail=f'Company with name -{company_name}- not found!')
+    links = json.dumps(request.links)
     new_user = models.Advocates(
-                            email=email, 
-                            password=password_hash, 
-                            company_id=company_id,
-                            name=request.name,
-                            short_bio=request.short_bio, 
-                            long_bio=request.long_bio, 
-                            advocate_years_exp=request.advocate_years_exp
-                            )
+                        email=email, 
+                        password=password_hash, 
+                        company_id=company_id,
+                        name=request.name,
+                        short_bio=request.short_bio, 
+                        long_bio=request.long_bio, 
+                        advocate_years_exp=request.advocate_years_exp,
+                        links=links
+                        )
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
@@ -71,16 +74,18 @@ def get_advocates_id(id, db):
         raise HTTPException(status_code=404, detail=f'User with id -{id}- not found!')
     return user
 
-# def update_profile(request, current_user, db):
-#     user = db.query(models.Advocates).filter(models.Advocates.email == current_user.email).first()
-#     request_data = dict(request)
-#     print(user.__dict__['name'])
-#     for key, data in request_data.items():
-#         if user.__dict__[key] != data:
-#             print(user)
-#             # user.update({key: data}, synchronize_session=False)
-#     db.commit()
-#     return user
+def update_profile(request, current_user, db):
+    user_obj = db.query(models.Advocates).filter(models.Advocates.email == current_user.email)
+    to_update = {}
+    for key, data in request:
+        if not data:
+            continue
+        to_update[key] = data
+    if to_update.get('links'):
+        to_update['links'] = json.dumps(to_update['links'])
+    user_obj.update(to_update, synchronize_session=False)
+    db.commit()
+    return "Successfully updated!"
 
 def new_company(name, href, request, db):
     company_check = db.query(models.Company).filter(models.Company.name == name).first()
