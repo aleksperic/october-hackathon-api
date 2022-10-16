@@ -8,6 +8,13 @@ class UserLinks(BaseModel):
 
 class UserLinksResponse(BaseModel):
     link: str
+    class Config:
+        orm_mode=True
+
+class UserLinksRequest(BaseModel):
+    link: List[str]
+    class Config:
+        orm_mode=True
 
 # Advocates base schema
 class AdvocatesBase(BaseModel):
@@ -31,11 +38,14 @@ class AdvocatesRequest(BaseModel):
     short_bio: str
     long_bio: str
     advocate_years_exp: int
-    links: UserLinksResponse | None
+    links: UserLinksRequest | None
 
 # Advocates request schema for updating Advocates
-class AdvocatesUpdateRequest(AdvocatesRequest):
-    pass
+class AdvocatesUpdateRequest(BaseModel):
+    name: str
+    short_bio: str
+    long_bio: str
+    advocate_years_exp: int
 
 # Company base schema
 class CompanyBase(BaseModel):

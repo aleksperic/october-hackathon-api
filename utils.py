@@ -49,7 +49,7 @@ def sign_up(email, password, company_name, request, db):
     company_id=db.query(models.Company.id).filter(models.Company.name == company_name)
     if not company_id.first():
         raise HTTPException(status_code=404, detail=f'Company with name -{company_name}- not found!')
-    links = json.dumps(request.links)
+
     new_user = models.Advocates(
                         email=email, 
                         password=password_hash, 
@@ -58,11 +58,17 @@ def sign_up(email, password, company_name, request, db):
                         short_bio=request.short_bio, 
                         long_bio=request.long_bio, 
                         advocate_years_exp=request.advocate_years_exp,
-                        links=links
-                        )
+                        ) 
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
+
+    for link in request.links.link:
+        new_link = models.UserLinks(link=link, user_id=new_user.id)
+        db.add(new_link)
+    db.commit()
+    db.refresh(new_link)
+
     return new_user
 
 def get_advocates(db):
@@ -81,8 +87,6 @@ def update_profile(request, current_user, db):
         if not data:
             continue
         to_update[key] = data
-    if to_update.get('links'):
-        to_update['links'] = json.dumps(to_update['links'])
     user_obj.update(to_update, synchronize_session=False)
     db.commit()
     return "Successfully updated!"
