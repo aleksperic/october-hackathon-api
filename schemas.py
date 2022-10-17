@@ -1,18 +1,20 @@
 from typing import List, Dict, Optional
-from pydantic import BaseModel, EmailStr, Field, Json
+from pydantic import BaseModel, EmailStr, Field, AnyUrl
 
 class UserLinks(BaseModel):
     id: int
-    link: str
+    title: str
+    url: str
     user_id: int
 
 class UserLinksResponse(BaseModel):
-    link: str
+    title: str
+    url: str
     class Config:
         orm_mode=True
 
 class UserLinksRequest(BaseModel):
-    link: List[str]
+    link: List[UserLinksResponse]
     class Config:
         orm_mode=True
 
@@ -42,10 +44,10 @@ class AdvocatesRequest(BaseModel):
 
 # Advocates request schema for updating Advocates
 class AdvocatesUpdateRequest(BaseModel):
-    name: str
-    short_bio: str
-    long_bio: str
-    advocate_years_exp: int
+    name: str | None = None
+    short_bio: str | None = None
+    long_bio: str | None = None
+    advocate_years_exp: int | None = None
 
 # Company base schema
 class CompanyBase(BaseModel):

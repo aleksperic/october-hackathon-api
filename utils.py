@@ -2,6 +2,7 @@ import io
 import pathlib
 import models
 import json
+from uuid import uuid1
 from auth import hash_password
 from fastapi import HTTPException
 
@@ -25,14 +26,14 @@ async def upload(file, user, db, route):
     bytes_str = io.BytesIO(uploaded_file)
     
     if route == '/advocates':
-        destination = UPLOAD_DIR / f'advocates/{user.name.replace(" ", "-")}{file_ext}'
+        destination = UPLOAD_DIR / f'advocates/{uuid1()}{file_ext}'
         with open(str(destination), 'wb') as out:
             out.write(bytes_str.read())
         user = db.query(models.Advocates).filter(models.Advocates.name == user.name)
         user.update({'profile_pic': str(destination)})
     
     if route == '/companies':
-        destination = UPLOAD_DIR / f'companies/{user.name.replace(" ", "-")}{file_ext}'
+        destination = UPLOAD_DIR / f'companies/{uuid1()}{file_ext}'
         with open(str(destination), 'wb') as out:
             out.write(bytes_str.read())
         company = db.query(models.Company).filter(models.Company.name == user.name)
@@ -62,9 +63,12 @@ def sign_up(email, password, company_name, request, db):
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-
-    for link in request.links.link:
-        new_link = models.UserLinks(link=link, user_id=new_user.id)
+    
+    for title, url in request.links.link:
+        link_check = db.query(models.UserLinks).filter(models.UserLinks.url == url[1]).first()
+        if link_check:
+            raise HTTPException(status_code=406, detail=f'Url -{url[1]}- alredy exists in database!')
+        new_link = models.UserLinks(title=title[1], url=url[1], user_id=new_user.id)
         db.add(new_link)
     db.commit()
     db.refresh(new_link)

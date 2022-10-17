@@ -34,7 +34,8 @@ class UserLinks(Base):
     __tablename__ = 'links'
 
     id = Column(Integer, primary_key=True)
-    link = Column(String, index=True)
+    title = Column(String, index=True)
+    url = Column(String, unique=True, index=True)
     user_id = Column(Integer, ForeignKey('advocates.id'))
 
     advocates = relationship('Advocates', back_populates='links')
