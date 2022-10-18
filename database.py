@@ -1,11 +1,22 @@
+import psycopg2
+from environs import Env
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
 
-SQLALCHEMY_DATABASE_URL = 'sqlite:///./hackathonDB.db'
+env = Env()
+env.read_env()
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={'check_same_thread': False})
+DB_USER = env.str('DB_USER')
+DB_USER_PASSWORD = env.str('DB_USER_PASSWORD')
+DB_HOST = env.str('DB_HOST')
+DB_NAME = env.str('DB_NAME')
+
+
+DATABASE_URL = f'postgresql://{DB_USER}:{DB_USER_PASSWORD}@{DB_HOST}/{DB_NAME}'
+
+engine = create_engine(DATABASE_URL)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
