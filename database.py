@@ -14,7 +14,7 @@ DB_HOST = env.str('DB_HOST')
 DB_NAME = env.str('DB_NAME')
 
 
-DATABASE_URL = f'postgresql://{DB_USER}:{DB_USER_PASSWORD}@{DB_HOST}/{DB_NAME}'
+DATABASE_URL = f'postgresql+psycopg2://{DB_USER}:{DB_USER_PASSWORD}@{DB_HOST}/{DB_NAME}'
 
 engine = create_engine(DATABASE_URL)
 
