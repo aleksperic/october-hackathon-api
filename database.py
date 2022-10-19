@@ -8,13 +8,7 @@ from sqlalchemy.ext.declarative import declarative_base
 env = Env()
 env.read_env()
 
-DB_USER = env.str('DB_USER')
-DB_USER_PASSWORD = env.str('DB_USER_PASSWORD')
-DB_HOST = env.str('DB_HOST')
-DB_NAME = env.str('DB_NAME')
-
-
-DATABASE_URL = f'postgresql+psycopg2://{DB_USER}:{DB_USER_PASSWORD}@db/{DB_NAME}'
+DATABASE_URL = env.str('DATABASE_URL')
 
 engine = create_engine(DATABASE_URL)
 
