@@ -1,0 +1,4 @@
+.vssode
+__pycache__
+*.db
+.env
