@@ -1,7 +1,7 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from database import Base, engine
 import auth, advocates, company
+from database import Base, engine
+from fastapi.middleware.cors import CORSMiddleware
 
 
 app = FastAPI()

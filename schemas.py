@@ -14,7 +14,7 @@ class UserLinksResponse(BaseModel):
         orm_mode=True
 
 class UserLinksRequest(BaseModel):
-    link: List[UserLinksResponse]
+    links: List[UserLinksResponse]
     class Config:
         orm_mode=True
 
@@ -54,17 +54,18 @@ class CompanyBase(BaseModel):
     id: int
     name: str
     logo: str | None = None
+    summary: str
 
     class Config:
         orm_mode = True
 
 # Extention from CompanyBase with more information for response to company routes
-class CompanyResponse1(CompanyBase):
+class CompanyResponseAdvocates(CompanyBase):
     summary: str
     advocates: List[AdvocatesBase] | None
 
 # Extention from CompanyBase with href information for response to advocates routes
-class CompanyResponse2(CompanyBase):
+class CompanyResponse(CompanyBase):
     href: str
 
 # Company request schema
@@ -75,9 +76,13 @@ class CompanyRequest(BaseModel):
 class CompanyPhotoUpload(BaseModel):
     name: str
 
-#A dvocates response schema for advocates routes
+# Advocates response schema for advocates routes
 class AdvocatesResponse(AdvocatesBase):
-       company: CompanyResponse2 | None
+       company: CompanyResponse | None
+
+# Company summary update schema
+class CompanyUpdate(CompanyRequest):
+    pass
 
 # Token response schema
 class Token(BaseModel):

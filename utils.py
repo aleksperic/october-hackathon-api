@@ -10,6 +10,8 @@ BASE_DIR = pathlib.Path(__file__).parent
 UPLOAD_DIR = BASE_DIR / 'uploads'
 
 
+# Function for uploading photos/logos for advocates/companies
+
 async def upload(file, user, db, route):
 
     uploaded_file = await file.read()
@@ -39,7 +41,9 @@ async def upload(file, user, db, route):
         company.update({'logo': str(destination)})
 
     db.commit()
-    return destination
+    return {'path_to_file': destination}
+
+# Advocates routes
 
 def sign_up(email, password, company_name, request, db):
     email_check = db.query(models.Advocates).filter(models.Advocates.email == email).first()
@@ -86,6 +90,9 @@ def get_advocates_id(id, db):
         raise HTTPException(status_code=404, detail=f'User with id - {id} - not found!')
     return user
 
+def my_profile(current_user):
+    return current_user
+
 def update_profile(request, current_user, db):
     user_obj = db.query(models.Advocates).filter(models.Advocates.email == current_user.email)
     to_update = {}
@@ -95,7 +102,34 @@ def update_profile(request, current_user, db):
         to_update[key] = data
     user_obj.update(to_update, synchronize_session=False)
     db.commit()
-    return {'detail': 'Successfully updated!'}
+    return user_obj.first()
+
+def update_links(request, current_user, db):
+    links_obj = db.query(models.UserLinks).filter(models.UserLinks.user_id == current_user.id)
+    links_obj_titles = [link.title for link in links_obj]
+
+    for link in request.links:
+        if not(link.title in links_obj_titles):
+            new_link = models.UserLinks(title=link.title, url=link.url, user_id=current_user.id)
+            db.add(new_link)
+
+        link_to_update = db.query(models.UserLinks).filter(models.UserLinks.title == link.title)
+        link_to_update.update({'title': link.title, 'url': link.url}, synchronize_session=False)
+    db.commit()
+    
+    return list(links_obj)
+
+def delete_advocate(current_user, db):
+    links = db.query(models.UserLinks).filter(models.UserLinks.user_id == current_user.id)
+    links.delete(synchronize_session=False)
+    user = db.query(models.Advocates).filter(models.Advocates.id == current_user.id)
+    user.delete(synchronize_session=False)
+    db.commit()
+
+    return {'detail': 'Deleted!'}
+
+
+# Companies routes
 
 def new_company(name, href, request, db):
     company_check = db.query(models.Company).filter(models.Company.name == name).first()
@@ -116,6 +150,15 @@ def new_company(name, href, request, db):
     
 def get_companies(db):
     return db.query(models.Company).all()
+
+def update_summary(id, request, db):
+    company = db.query(models.Company).filter(models.Company.id == id)
+    if not company.first():
+        raise HTTPException(status_code=404, detail=f'Company with id - {id} - not found!')
+    company.update({'summary': request.summary}, synchronize_session=False)
+    db.commit()
+
+    return company.first()
 
 def get_companies_id(id, db):
     company = db.query(models.Company).filter(models.Company.id == id).first()

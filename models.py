@@ -17,7 +17,8 @@ class Advocates(Base):
     company_id = Column(Integer, ForeignKey('company.id'))
 
     company = relationship('Company', back_populates='advocates')
-    links = relationship('UserLinks', back_populates='advocates')
+    links = relationship('UserLinks', back_populates='advocates', cascade="delete", passive_deletes=True)
+
 class Company(Base):
 
     __tablename__ = 'company'
@@ -36,6 +37,6 @@ class UserLinks(Base):
     id = Column(Integer, primary_key=True)
     title = Column(String, index=True)
     url = Column(String, unique=True, index=True)
-    user_id = Column(Integer, ForeignKey('advocates.id'))
+    user_id = Column(Integer, ForeignKey('advocates.id', ondelete='CASCADE'))
 
     advocates = relationship('Advocates', back_populates='links')

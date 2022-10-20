@@ -8,7 +8,6 @@ from sqlalchemy.orm import Session
 from database import get_db
 from auth import get_current_user
 from typing import List
-from pydantic import EmailStr
 import schemas, utils
 
 
@@ -18,24 +17,15 @@ router = APIRouter(
             )
 
 # Advocates routes
-@router.post('/sign_up', response_model=schemas.AdvocatesResponse, tags=['Signup/Login'])
-def sign_up(
-            email: EmailStr,
-            password: str,
-            company_name: str,
-            request: schemas.AdvocatesRequest,
-            db: Session = Depends(get_db)
-            ):
-    return utils.sign_up(email, password, company_name, request, db)
 
-@router.get('/', response_model=List[schemas.AdvocatesResponse])
+@router.get('', response_model=List[schemas.AdvocatesResponse], status_code=200)
 def get_advocates(
             current_user: schemas.AdvocatesResponse = Depends(get_current_user), 
             db: Session = Depends(get_db)
             ):
     return utils.get_advocates(db)
 
-@router.get('/{id}', response_model=schemas.AdvocatesResponse)
+@router.get('/{id}', response_model=schemas.AdvocatesResponse, status_code=200)
 def get_advocates_id(
             id: int, 
             db: Session = Depends(get_db),
@@ -43,11 +33,13 @@ def get_advocates_id(
             ):
     return utils.get_advocates_id(id, db)
 
-@router.get('/me/profile', response_model=schemas.AdvocatesResponse)
-def my_profile(current_user: schemas.AdvocatesResponse = Depends(get_current_user)):
-    return current_user
+@router.get('/me/profile', response_model=schemas.AdvocatesResponse, status_code=200)
+def my_profile(
+            current_user: schemas.AdvocatesResponse = Depends(get_current_user)
+            ):
+    return utils.my_profile(current_user)
 
-@router.put('/me/update')
+@router.put('/me/update', status_code=202)
 def update_profile(
             request: schemas.AdvocatesUpdateRequest,
             current_user: schemas.AdvocatesResponse = Depends(get_current_user), 
@@ -55,7 +47,15 @@ def update_profile(
             ):
     return utils.update_profile(request, current_user, db)
 
-@router.post('/upload')
+@router.put('/me/update_links', response_model=List[schemas.UserLinksResponse], status_code=202)
+def update_links(
+            request: schemas.UserLinksRequest,
+            current_user: schemas.AdvocatesResponse = Depends(get_current_user),
+            db: Session = Depends(get_db)
+            ):
+    return utils.update_links(request, current_user, db)
+
+@router.post('/me/upload_photo', status_code=202)
 async def upload_photo(
             file: UploadFile = File(...),
             current_user: schemas.AdvocatesResponse = Depends(get_current_user), 
@@ -63,3 +63,10 @@ async def upload_photo(
             ):
     route = router.prefix
     return await utils.upload(file, current_user, db, route)
+
+@router.delete('/me/delete', status_code=200)
+def delete_advocate(
+            current_user:  schemas.AdvocatesResponse = Depends(get_current_user), 
+            db: Session = Depends(get_db)
+            ):
+    return utils.delete_advocate(current_user, db)

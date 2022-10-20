@@ -28,13 +28,7 @@ CREDENTIALS_EXCEPTION = HTTPException(
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
         )
-
-# Custom login form
-class OAuth2CustomForm:
-    def __init__(self,  email: EmailStr = Form(), password: str = Form()):
-        self.email = email
-        self.password = password
-
+        
 
 def hash_password(password: str):
     return pwd_context.hash(password)
@@ -78,10 +72,20 @@ def get_current_user(token: str = Depends(oauth2_schema), db: Session = Depends(
     return user
 
 
-@router.post('/login', response_model=schemas.Token, tags=['Signup/Login'])
+@router.post('/login', response_model=schemas.Token, status_code=200, tags=['Signup/Login'])
 def login_auth(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = authenticate_user(form_data.username, form_data.password, db)
     if user is None:
         raise CREDENTIALS_EXCEPTION
     access_token = create_access_token({'sub': user.email}, ACCESS_TOKEN_EXPIRE_MINUTES)
     return {'access_token': access_token, 'token_type': 'bearer'}
+
+@router.post('/sign_up', response_model=schemas.AdvocatesResponse, status_code=201, tags=['Signup/Login'])
+def sign_up(
+            email: EmailStr,
+            password: str,
+            company_name: str,
+            request: schemas.AdvocatesRequest,
+            db: Session = Depends(get_db)
+            ):
+    return utils.sign_up(email, password, company_name, request, db)
