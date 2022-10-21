@@ -1,4 +1,4 @@
-import models, schemas, utils
+import models, schemas
 from pydantic import EmailStr
 from database import get_db
 from datetime import datetime, timedelta
@@ -88,4 +88,38 @@ def sign_up(
             request: schemas.AdvocatesRequest,
             db: Session = Depends(get_db)
             ):
-    return utils.sign_up(email, password, company_name, request, db)
+    
+    email_check = db.query(models.Advocates).filter(models.Advocates.email == email).first()
+    if email_check:
+        raise HTTPException(status_code=406, detail=f'User with email - {email} - alredy exists!')
+    password_hash = hash_password(password)
+    company_id=db.query(models.Company.id).filter(models.Company.name == company_name)
+    if not company_id.first():
+        raise HTTPException(status_code=404, detail=f'Company with name - {company_name} - not found! Register your company first.')
+
+    new_user = models.Advocates(
+                        email=email, 
+                        password=password_hash, 
+                        company_id=company_id,
+                        name=request.name,
+                        short_bio=request.short_bio, 
+                        long_bio=request.long_bio, 
+                        advocate_years_exp=request.advocate_years_exp,
+                        ) 
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    
+    for title, url in request.links.links:
+        link_check = db.query(models.UserLinks).filter(models.UserLinks.url == url[1]).first()
+        if link_check:
+            db.delete(new_user)
+            db.commit()
+            raise HTTPException(status_code=406, detail=f'Url - {url[1]} - alredy exists in database!')
+        new_link = models.UserLinks(title=title[1], url=url[1], user_id=new_user.id)
+        db.add(new_link)
+
+    db.commit()
+    db.refresh(new_link)
+
+    return new_user

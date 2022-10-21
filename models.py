@@ -23,7 +23,7 @@ class Company(Base):
 
     __tablename__ = 'company'
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True)
     name = Column(String, unique=True, index=True)
     logo = Column(String)
     summary = Column(String)
