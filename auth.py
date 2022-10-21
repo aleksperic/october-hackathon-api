@@ -1,4 +1,4 @@
-import models, schemas
+import models, schemas, utils
 from pydantic import EmailStr
 from database import get_db
 from datetime import datetime, timedelta
@@ -28,7 +28,7 @@ CREDENTIALS_EXCEPTION = HTTPException(
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
         )
-        
+
 
 def hash_password(password: str):
     return pwd_context.hash(password)
