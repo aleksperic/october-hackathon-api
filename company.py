@@ -30,7 +30,6 @@ def new_company(
 @router.get('', response_model=List[schemas.CompanyResponseAdvocates], status_code=200)
 def get_companies(
             db: Session = Depends(get_db),
-        #     current_user: schemas.AdvocatesResponse = Depends(get_current_user)
             ):
     return utils.get_companies(db)
 
@@ -38,7 +37,6 @@ def get_companies(
 def get_companies_id(
             id: int,
             db: Session = Depends(get_db),
-        #     current_user: schemas.AdvocatesResponse = Depends(get_current_user)
             ):
     return utils.get_companies_id(id, db)
 
@@ -49,8 +47,6 @@ def update_summary(
         #     current_user: schemas.AdvocatesResponse = Depends(get_current_user),
             db: Session = Depends(get_db)
             ):
-        
-#     print(current_user.id)
     return utils.update_summary(id, request,db)
 
 @router.post('/upload_logo/{name}', status_code=202)

@@ -20,7 +20,6 @@ router = APIRouter(
 
 @router.get('', response_model=List[schemas.AdvocatesResponse], status_code=200)
 def get_advocates(
-            current_user: schemas.AdvocatesResponse = Depends(get_current_user), 
             db: Session = Depends(get_db)
             ):
     return utils.get_advocates(db)
@@ -28,8 +27,7 @@ def get_advocates(
 @router.get('/{id}', response_model=schemas.AdvocatesResponse, status_code=200)
 def get_advocates_id(
             id: int, 
-            db: Session = Depends(get_db),
-            current_user: schemas.AdvocatesResponse = Depends(get_current_user)
+            db: Session = Depends(get_db)
             ):
     return utils.get_advocates_id(id, db)
 

@@ -32,6 +32,7 @@ class Company(Base):
     advocates = relationship('Advocates', back_populates='company')
 
 class UserLinks(Base):
+    
     __tablename__ = 'links'
 
     id = Column(Integer, primary_key=True)
