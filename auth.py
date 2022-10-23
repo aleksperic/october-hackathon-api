@@ -84,7 +84,6 @@ def login_auth(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = D
 def sign_up(
             email: EmailStr,
             password: str,
-            company_name: str,
             request: schemas.AdvocatesRequest,
             db: Session = Depends(get_db)
             ):
@@ -93,9 +92,9 @@ def sign_up(
     if email_check:
         raise HTTPException(status_code=406, detail=f'User with email - {email} - alredy exists!')
     password_hash = hash_password(password)
-    company_id=db.query(models.Company.id).filter(models.Company.name == company_name)
+    company_id = db.query(models.Company.id).filter(models.Company.name == request.company_name)
     if not company_id.first():
-        raise HTTPException(status_code=404, detail=f'Company with name - {company_name} - not found! Register your company first.')
+        company_id = None
 
     new_user = models.Advocates(
                         email=email, 

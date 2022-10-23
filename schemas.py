@@ -37,14 +37,16 @@ class AdvocatesBase(BaseModel):
 class AdvocatesRequest(BaseModel):
     
     name: str
-    short_bio: str
-    long_bio: str
-    advocate_years_exp: int
+    company_name: str | None
+    short_bio: str | None
+    long_bio: str | None
+    advocate_years_exp: int | None
     links: UserLinksRequest | None
 
 # Advocates request schema for updating Advocates
 class AdvocatesUpdateRequest(BaseModel):
     name: str | None = None
+    company_name: str | None = None
     short_bio: str | None = None
     long_bio: str | None = None
     advocate_years_exp: int | None = None

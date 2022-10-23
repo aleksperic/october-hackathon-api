@@ -37,7 +37,7 @@ def my_profile(
             ):
     return utils.my_profile(current_user)
 
-@router.put('/me/update', status_code=202)
+@router.put('/me/update', response_model=schemas.AdvocatesResponse, status_code=202)
 def update_profile(
             request: schemas.AdvocatesUpdateRequest,
             current_user: schemas.AdvocatesResponse = Depends(get_current_user), 

@@ -59,8 +59,13 @@ def my_profile(current_user):
 def update_profile(request, current_user, db):
     user_obj = db.query(models.Advocates).filter(models.Advocates.email == current_user.email)
     to_update = {}
+    if request.company_name:
+        company = db.query(models.Company).filter(models.Company.name == request.company_name).first()
+        if not company:
+            raise HTTPException(status_code=404, detail=f'Company with name - {request.company_name} - not found!')
+        to_update['company_id'] = company.id
     for key, data in request:
-        if not data:
+        if (not data) | (key == 'company_name'):
             continue
         to_update[key] = data
     user_obj.update(to_update, synchronize_session=False)
@@ -98,7 +103,7 @@ def new_company(name, href, request, db):
     company_check = db.query(models.Company).filter(models.Company.name == name).first()
     if company_check:
         raise HTTPException(status_code=406, detail=f'Company with name - {name} - alredy exists!')
-        
+
     href = href.url.path
     new_company = models.Company(name=name, summary=request.summary, href=href)
     db.add(new_company)
