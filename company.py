@@ -17,7 +17,7 @@ router = APIRouter(
             tags=['Company']
             )
 
-@router.post('', response_model=schemas.CompanyResponse, status_code=201)
+@router.post('/', response_model=schemas.CompanyResponse, status_code=201)
 def new_company(
             name: str,
             href: Request,
@@ -27,20 +27,21 @@ def new_company(
             ):
     return utils.new_company(name, href, request, db)
     
-@router.get('', response_model=List[schemas.CompanyResponseAdvocates], status_code=200)
+@router.get('/', response_model=List[schemas.CompanyResponseAdvocates], status_code=200)
 def get_companies(
+            limit: int = 10,
             db: Session = Depends(get_db),
             ):
-    return utils.get_companies(db)
+    return utils.get_companies(limit, db)
 
-@router.get('/{id}', response_model=schemas.CompanyResponseAdvocates, status_code=200)
+@router.get('/{id}/', response_model=schemas.CompanyResponseAdvocates, status_code=200)
 def get_companies_id(
             id: int,
             db: Session = Depends(get_db),
             ):
     return utils.get_companies_id(id, db)
 
-@router.put('/update_summary/{id}', response_model=schemas.CompanyResponse, status_code=202)
+@router.put('/{id}/', response_model=schemas.CompanyResponse, status_code=202)
 def update_summary(
             id: int, 
             request: schemas.CompanyUpdate,
@@ -49,7 +50,7 @@ def update_summary(
             ):
     return utils.update_summary(id, request,db)
 
-@router.post('/upload_logo/{name}', status_code=202)
+@router.post('/upload_logo/{name}/', status_code=202)
 async def upload_logo(
             name: str = Depends(schemas.CompanyPhotoUpload),
             file: UploadFile = File(...),

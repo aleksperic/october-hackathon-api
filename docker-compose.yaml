@@ -12,6 +12,8 @@ services:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_USER_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
+    volumes: 
+      - db:/var/lib/postgresql/data
   
   app:
     container_name: app
@@ -28,3 +30,7 @@ services:
     depends_on:
       - db
     restart: always
+  
+volumes:
+  db:
+    driver: local

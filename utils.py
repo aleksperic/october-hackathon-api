@@ -44,8 +44,8 @@ async def upload(file, user, db, route):
 
 # Advocates routes
 
-def get_advocates(db):
-    return db.query(models.Advocates).all()
+def get_advocates(limit, db):
+    return list(db.query(models.Advocates).limit(limit))
 
 def get_advocates_id(id, db):
     user = db.query(models.Advocates).filter(models.Advocates.id == id).first()
@@ -113,8 +113,8 @@ def new_company(name, href, request, db):
     db.refresh(new_company)
     return new_company
     
-def get_companies(db):
-    return db.query(models.Company).all()
+def get_companies(limit, db):
+    return list(db.query(models.Company).limit(limit))
 
 def update_summary(id, request, db):
     company = db.query(models.Company).filter(models.Company.id == id)
