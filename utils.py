@@ -3,6 +3,8 @@ import pathlib
 import models
 from uuid import uuid1
 from fastapi import HTTPException
+from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
 
 
 BASE_DIR = pathlib.Path(__file__).parent
@@ -108,7 +110,7 @@ def new_company(name, href, request, db):
     new_company = models.Company(name=name, summary=request.summary, href=href)
     db.add(new_company)
     db.commit()
-    new_company.href += f'/{new_company.id}'
+    new_company.href += f'{new_company.id}'
     db.commit()
     db.refresh(new_company)
     return new_company
@@ -130,3 +132,21 @@ def get_companies_id(id, db):
     if not company:
         raise HTTPException(status_code=404, detail=f'Company with id - {id} - not found!')
     return company
+
+# Search funcionallity
+
+def search(query, db):
+    entities = [
+                models.Advocates.id, 
+                models.Advocates.name,
+                models.Advocates.email, 
+                models.Advocates.short_bio, 
+                models.Advocates.company_id
+                ]
+
+    users = db.query(models.Advocates).filter(models.Advocates.name.startswith(query)).with_entities(*entities)
+    companies = db.query(models.Company).filter(models.Company.name.startswith(query))
+
+    results = [*list(users), *list(companies)]
+    results = jsonable_encoder(results)
+    return JSONResponse(results)

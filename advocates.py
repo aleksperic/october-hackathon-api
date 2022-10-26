@@ -17,6 +17,7 @@ router = APIRouter(
             tags=['Advocates']
             )
 
+
 # Advocates routes
 
 @router.post('/', response_model=schemas.AdvocatesResponse, status_code=201)

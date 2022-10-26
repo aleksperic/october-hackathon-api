@@ -71,8 +71,9 @@ def get_current_user(token: str = Depends(oauth2_schema), db: Session = Depends(
         raise CREDENTIALS_EXCEPTION
     return user
 
+# Login route
 
-@router.post('/login', response_model=schemas.Token, status_code=200, tags=['Signup/Login'])
+@router.post('/login', response_model=schemas.Token, status_code=200, tags=['Login'])
 def login_auth(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = authenticate_user(form_data.username, form_data.password, db)
     if user is None:
